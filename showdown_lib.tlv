@@ -1544,3 +1544,6 @@ module team_trial (
    *failed = /secret$failed;
 \SV
    endmodule
+\TLV team_trial(/_top)
+   m5+verilog_wrapper(/_top, trial)
+
