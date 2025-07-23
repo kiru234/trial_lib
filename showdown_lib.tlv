@@ -435,8 +435,226 @@
 
 // An opponent providing demo first-player behavior.
 \TLV team_demo1(/_top)
+   /ship[*]
+      $xx_acc[7:0] = #ship == 0 ?
+                      *cyc_cnt == 1 ? (8'd3) :
+                      *cyc_cnt == 2 ? (8'd3) :
+                      *cyc_cnt == 3 ? (8'd2) :
+                      *cyc_cnt == 5 ? (-8'd2) :
+                      *cyc_cnt == 6 ? (-8'd2) :
+                      *cyc_cnt == 7 ? (-8'd1) :
+                      *cyc_cnt == 8 ? (-8'd1) :
+                      *cyc_cnt == 9 ? (8'd2) :
+                      *cyc_cnt == 10 ? (8'd2) :
+                      *cyc_cnt == 12 ? (-8'd1) :
+                      *cyc_cnt == 13 ? (-8'd3) :
+                      *cyc_cnt == 14 ? (-8'd1) :
+                      *cyc_cnt == 15 ? (-8'd1) :
+                      8'd0 :
+                   #ship == 1 ?
+                      *cyc_cnt == 1 ? (8'd3) :
+                      *cyc_cnt == 2 ? (8'd3) :
+                      *cyc_cnt == 3 ? (8'd1) :
+                      *cyc_cnt == 4 ? (-8'd3) :
+                      *cyc_cnt == 5 ? (-8'd2) :
+                      *cyc_cnt == 7 ? (8'd1) :
+                      *cyc_cnt == 8 ? (-8'd1) :
+                      *cyc_cnt == 9 ? (8'd1) :
+                      *cyc_cnt == 10 ? (8'd3) :
+                      8'd0 :
+                   *cyc_cnt == 1 ? (8'd3) :
+                   *cyc_cnt == 2 ? (8'd3) :
+                   *cyc_cnt == 3 ? (8'd1) :
+                   *cyc_cnt == 7 ? (-8'd1) :
+                   *cyc_cnt == 8 ? (-8'd2) :
+                   *cyc_cnt == 9 ? (-8'd2) :
+                   *cyc_cnt == 10 ? (-8'd1) :
+                   *cyc_cnt == 11 ? (-8'd1) :
+                   *cyc_cnt == 13 ? (8'd1) :
+                   *cyc_cnt == 14 ? (8'd1) :
+                   8'd0;
+      
+      $yy_acc[3:0] = #ship == 0 ?
+                      *cyc_cnt == 1 ? (8'd2) :
+                      *cyc_cnt == 2 ? (8'd1) :
+                      *cyc_cnt == 8 ? (-8'd1) :
+                      *cyc_cnt == 9 ? (-8'd3) :
+                      *cyc_cnt == 10 ? (-8'd2) :
+                      *cyc_cnt == 11 ? (8'd1) :
+                      *cyc_cnt == 12 ? (8'd3) :
+                      *cyc_cnt == 13 ? (8'd3) :
+                      *cyc_cnt == 14 ? (8'd1) :
+                      *cyc_cnt == 16 ? (-8'd1) :
+                      *cyc_cnt == 17 ? (-8'd3) :
+                      *cyc_cnt == 18 ? (-8'd3) :
+                      *cyc_cnt == 19 ? (-8'd2) :
+                      *cyc_cnt == 20 ? (-8'd1) :
+                      8'd0 :
+                   #ship == 1 ?
+                      *cyc_cnt == 1 ? (8'd3) :
+                      *cyc_cnt == 2 ? (8'd3) :
+                      *cyc_cnt == 3 ? (8'd1) :
+                      *cyc_cnt == 7 ? (-8'd1) :
+                      *cyc_cnt == 8 ? (-8'd2) :
+                      *cyc_cnt == 9 ? (-8'd2) :
+                      *cyc_cnt == 10 ? (-8'd2) :
+                      8'd0 :
+                   *cyc_cnt == 4 ? (8'd1) :
+                   *cyc_cnt == 5 ? (8'd1) :
+                   *cyc_cnt == 6 ? (8'd1) :
+                   *cyc_cnt == 7 ? (8'd1) :
+                   *cyc_cnt == 8 ? (8'd1) :
+                   *cyc_cnt == 9 ? (8'd1) :
+                   *cyc_cnt == 10 ? (8'd1) :
+                   *cyc_cnt == 13 ? (8'd1) :
+                   8'd0;
+      
+      
+      
+      $attempt_fire = #ship == 0 ?
+                         (*cyc_cnt == 7) || (*cyc_cnt == 17) :
+                      #ship == 1 ?
+                         (*cyc_cnt == 4) :
+                      (*cyc_cnt == 6) || (*cyc_cnt == 16);
+      
+      $fire_dir[1:0] = #ship == 0 ?
+                          2'b11 :
+                       #ship == 1 ?
+                          2'b11 :
+                       (*cyc_cnt == 16) ? 2'b10 : 2'b11;
+      
+      $attempt_shield = #ship == 0 ?
+                           (*cyc_cnt >= 16) && (*cyc_cnt <= 19) :
+                        #ship == 1 ?
+                           (*cyc_cnt == 5) || (*cyc_cnt == 6) :
+                        1'b0;
+      
+      $attempt_cloak = #ship == 0 ?
+                          (*cyc_cnt >= 4) && (*cyc_cnt <= 10) :
+                       #ship == 1 ?
+                          1'b0 :
+                       1'b0;
+      
+\TLV team_demo1_viz(/_top, _team_num)
+   // Visualize IOs.
+   m5+io_viz_only(/_top, _team_num)
+
+
+// Team logic providing demo second player behavior.
+\TLV team_demo2(/_top)
+   /ship[*]
+      $xx_acc[7:0] = #ship == 0 ?
+                      *cyc_cnt == 1 ? (-8'd3) :
+                      *cyc_cnt == 2 ? (-8'd2) :
+                      *cyc_cnt == 3 ? (-8'd1) :
+                      *cyc_cnt == 4 ? (8'd3) :
+                      *cyc_cnt == 5 ? (8'd3) :
+                      *cyc_cnt == 6 ? (8'd3) :
+                      *cyc_cnt == 7 ? (8'd3) :
+                      *cyc_cnt == 11 ? (-8'd2) :
+                      *cyc_cnt == 12 ? (-8'd3) :
+                      *cyc_cnt == 13 ? (-8'd3) :
+                      *cyc_cnt == 14 ? (8'd3) :
+                      *cyc_cnt == 15 ? (8'd2) :
+                      *cyc_cnt == 16 ? (-8'd3) :
+                      *cyc_cnt == 19 ? (8'd1) :
+                      *cyc_cnt == 20 ? (8'd1) :
+                      8'd0 :
+                   #ship == 1 ?
+                      *cyc_cnt == 1 ? (8'd3) :
+                      *cyc_cnt == 2 ? (8'd3) :
+                      *cyc_cnt == 3 ? (8'd1) :
+                      *cyc_cnt == 7 ? (-8'd2) :
+                      *cyc_cnt == 8 ? (8'd0) :
+                      8'd0 :
+                   *cyc_cnt == 1 ? (8'd3) :
+                   *cyc_cnt == 2 ? (8'd3) :
+                   *cyc_cnt == 3 ? (8'd1) :
+                   8'd0;
+      
+      $yy_acc[3:0] = #ship == 0 ?
+                      *cyc_cnt == 1 ? (-8'd3) :
+                      *cyc_cnt == 2 ? (-8'd2) :
+                      *cyc_cnt == 3 ? (8'd1) :
+                      *cyc_cnt == 4 ? (8'd1) :
+                      *cyc_cnt == 6 ? (8'd3) :
+                      *cyc_cnt == 11 ? (8'd2) :
+                      *cyc_cnt == 12 ? (8'd2) :
+                      *cyc_cnt == 14 ? (8'd3) :
+                      *cyc_cnt == 15 ? (-8'd1) :
+                      *cyc_cnt == 16 ? (-8'd2) :
+                      *cyc_cnt == 17 ? (8'd3) :
+                      *cyc_cnt == 18 ? (8'd2) :
+                      8'd0 :
+                   #ship == 1 ?
+                      *cyc_cnt == 1 ? (8'd1) :
+                      *cyc_cnt == 2 ? (8'd2) :
+                      *cyc_cnt == 5 ? (-8'd2) :
+                      *cyc_cnt == 6 ? (-8'd2) :
+                      *cyc_cnt == 7 ? (-8'd1) :
+                      8'd0 :
+                   *cyc_cnt == 1 ? (-8'd1) :
+                   *cyc_cnt == 2 ? (-8'd1) :
+                   *cyc_cnt == 4 ? (8'd1) :
+                   *cyc_cnt == 5 ? (8'd2) :
+                   *cyc_cnt == 6 ? (8'd2) :
+                   8'd0;
+      
+      
+      $attempt_fire = #ship == 0 ?
+                         (*cyc_cnt == 5) || (*cyc_cnt == 15) || (*cyc_cnt == 18) :
+                      #ship == 1 ?
+                         (*cyc_cnt == 8) :
+                      (*cyc_cnt == 5);
+      
+      $fire_dir[1:0] = #ship == 0 ?
+                          (*cyc_cnt == 15) ? 2'b10 :
+                          (*cyc_cnt == 18) ? 2'b11 :
+                          2'b00 :
+                       #ship == 1 ?
+                          2'b1 :
+                       2'b11;
+      
+      $attempt_shield = #ship == 0 ?
+                         (*cyc_cnt >= 8) && (*cyc_cnt <= 13) :
+                      #ship == 1 ?
+                         1'b0 :
+                      1'b0;
+      
+      $attempt_cloak = #ship == 0 ?
+                          1'b0 :
+                       #ship == 1 ?
+                          1'b0 :
+                       (*cyc_cnt >= 4);
+
+\TLV team_demo2_viz(/_top, _team_num)
+   // Visualize IOs.
+   m5+io_viz_only(/_top, _team_num)
+
 \SV
-localparam signed [7:0] BORDER = 32;
+module team_trial (
+      // Inputs:
+      input logic clk, input logic reset,
+      input logic signed [7:0] x [m5_SHIP_RANGE], input logic signed [7:0] y [m5_SHIP_RANGE],   // Positions of your ships, as affected by last cycle's acceleration.
+      input logic [7:0] energy [m5_SHIP_RANGE],   // The energy supply of each ship, as affected by last cycle's actions.
+      input logic [m5_SHIP_RANGE] destroyed,   // Asserted if and when the ships are destroyed.
+      input logic signed [7:0] enemy_x_p [m5_SHIP_RANGE], input logic signed [7:0] enemy_y_p [m5_SHIP_RANGE],   // Positions of enemy ships as affected by their acceleration last cycle.
+      input logic [m5_SHIP_RANGE] enemy_cloaked,   // Whether the enemy ships are cloaked, in which case their enemy_x_p and enemy_y_p will not update.
+      input logic [m5_SHIP_RANGE] enemy_destroyed, // Whether the enemy ships have been destroyed.
+      // Outputs:
+      output logic signed [3:0] x_a [m5_SHIP_RANGE], output logic signed [3:0] y_a [m5_SHIP_RANGE],  // Attempted acceleration for each of your ships; capped by max_acceleration (see showdown_lib.tlv).
+      output logic [m5_SHIP_RANGE] attempt_fire, output logic [m5_SHIP_RANGE] attempt_shield, output logic [m5_SHIP_RANGE] attempt_cloak,  // Attempted actions for each of your ships.
+      output logic [1:0] fire_dir [m5_SHIP_RANGE]   // Direction to fire (if firing). (For the first player: 0 = right, 1 = down, 2 = left, 3 = up)
+   );
+   
+   // Parameters defining the valid ranges of input/output values can be found near the top of "showdown_lib.tlv".
+   
+   // /------------------------------\
+   // | Your Verilog logic goes here |
+   // \------------------------------/
+      
+   // E.g.:
+  localparam signed [7:0] BORDER = 32;
 localparam signed [7:0] MARGIN = 2;
 
 localparam FIRE_COST = 30;
@@ -588,103 +806,11 @@ for (i = 0; i < 3; i++) begin : ship_logic
 
 end
 endgenerate
-      
-\TLV team_demo1_viz(/_top, _team_num)
+endmodule
+
+\TLV team_trial_viz(/_top, _team_num)
    // Visualize IOs.
    m5+io_viz_only(/_top, _team_num)
-
-
-// Team logic providing demo second player behavior.
-\TLV team_demo2(/_top)
-   /ship[*]
-      $xx_acc[7:0] = #ship == 0 ?
-                      *cyc_cnt == 1 ? (-8'd3) :
-                      *cyc_cnt == 2 ? (-8'd2) :
-                      *cyc_cnt == 3 ? (-8'd1) :
-                      *cyc_cnt == 4 ? (8'd3) :
-                      *cyc_cnt == 5 ? (8'd3) :
-                      *cyc_cnt == 6 ? (8'd3) :
-                      *cyc_cnt == 7 ? (8'd3) :
-                      *cyc_cnt == 11 ? (-8'd2) :
-                      *cyc_cnt == 12 ? (-8'd3) :
-                      *cyc_cnt == 13 ? (-8'd3) :
-                      *cyc_cnt == 14 ? (8'd3) :
-                      *cyc_cnt == 15 ? (8'd2) :
-                      *cyc_cnt == 16 ? (-8'd3) :
-                      *cyc_cnt == 19 ? (8'd1) :
-                      *cyc_cnt == 20 ? (8'd1) :
-                      8'd0 :
-                   #ship == 1 ?
-                      *cyc_cnt == 1 ? (8'd3) :
-                      *cyc_cnt == 2 ? (8'd3) :
-                      *cyc_cnt == 3 ? (8'd1) :
-                      *cyc_cnt == 7 ? (-8'd2) :
-                      *cyc_cnt == 8 ? (8'd0) :
-                      8'd0 :
-                   *cyc_cnt == 1 ? (8'd3) :
-                   *cyc_cnt == 2 ? (8'd3) :
-                   *cyc_cnt == 3 ? (8'd1) :
-                   8'd0;
-      
-      $yy_acc[3:0] = #ship == 0 ?
-                      *cyc_cnt == 1 ? (-8'd3) :
-                      *cyc_cnt == 2 ? (-8'd2) :
-                      *cyc_cnt == 3 ? (8'd1) :
-                      *cyc_cnt == 4 ? (8'd1) :
-                      *cyc_cnt == 6 ? (8'd3) :
-                      *cyc_cnt == 11 ? (8'd2) :
-                      *cyc_cnt == 12 ? (8'd2) :
-                      *cyc_cnt == 14 ? (8'd3) :
-                      *cyc_cnt == 15 ? (-8'd1) :
-                      *cyc_cnt == 16 ? (-8'd2) :
-                      *cyc_cnt == 17 ? (8'd3) :
-                      *cyc_cnt == 18 ? (8'd2) :
-                      8'd0 :
-                   #ship == 1 ?
-                      *cyc_cnt == 1 ? (8'd1) :
-                      *cyc_cnt == 2 ? (8'd2) :
-                      *cyc_cnt == 5 ? (-8'd2) :
-                      *cyc_cnt == 6 ? (-8'd2) :
-                      *cyc_cnt == 7 ? (-8'd1) :
-                      8'd0 :
-                   *cyc_cnt == 1 ? (-8'd1) :
-                   *cyc_cnt == 2 ? (-8'd1) :
-                   *cyc_cnt == 4 ? (8'd1) :
-                   *cyc_cnt == 5 ? (8'd2) :
-                   *cyc_cnt == 6 ? (8'd2) :
-                   8'd0;
-      
-      
-      $attempt_fire = #ship == 0 ?
-                         (*cyc_cnt == 5) || (*cyc_cnt == 15) || (*cyc_cnt == 18) :
-                      #ship == 1 ?
-                         (*cyc_cnt == 8) :
-                      (*cyc_cnt == 5);
-      
-      $fire_dir[1:0] = #ship == 0 ?
-                          (*cyc_cnt == 15) ? 2'b10 :
-                          (*cyc_cnt == 18) ? 2'b11 :
-                          2'b00 :
-                       #ship == 1 ?
-                          2'b1 :
-                       2'b11;
-      
-      $attempt_shield = #ship == 0 ?
-                         (*cyc_cnt >= 8) && (*cyc_cnt <= 13) :
-                      #ship == 1 ?
-                         1'b0 :
-                      1'b0;
-      
-      $attempt_cloak = #ship == 0 ?
-                          1'b0 :
-                       #ship == 1 ?
-                          1'b0 :
-                       (*cyc_cnt >= 4);
-
-\TLV team_demo2_viz(/_top, _team_num)
-   // Visualize IOs.
-   m5+io_viz_only(/_top, _team_num)
-
 
 // An opponent that uses default values (and thus, the ships do absolutely nothing).
 \TLV team_sitting_duck(/_top)
@@ -1564,9 +1690,9 @@ endgenerate
    m5_team(random, Random 1)
    ///m5_team(random, Random 2)
    ///m5_team(demo1, Demo 1)
-   m5_team(demo2, Demo 2)
+   ///m5_team(demo2, Demo 2)
    ///m5_team(sitting_duck, Sitting Duck)
-   
+   m5_team(trial, test 1)
    // Instantiate the Showdown environment.
    m5+showdown(/top, /secret)
    
