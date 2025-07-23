@@ -434,7 +434,7 @@
 
 
 // An opponent providing demo first-player behavior.
-\TLV team_demo1(/_top)
+\TLV team_demo3(/_top)
    /ship[*]
       $xx_acc[7:0] = #ship == 0 ?
                       *cyc_cnt == 1 ? (8'd3) :
@@ -535,7 +535,7 @@
                           1'b0 :
                        1'b0;
       
-\TLV team_demo1_viz(/_top, _team_num)
+\TLV team_demo3_viz(/_top, _team_num)
    // Visualize IOs.
    m5+io_viz_only(/_top, _team_num)
 
@@ -733,7 +733,7 @@
                           1'b0 :
                        1'b0;
       
-\TLV team_demo1_viz(/_top, _team_num)
+\TLV team_demo3_viz(/_top, _team_num)
    // Visualize IOs.
    m5+io_viz_only(/_top, _team_num)
 
@@ -1723,7 +1723,7 @@
    // Define teams.
    m5_team(random, Random 1)
    ///m5_team(random, Random 2)
-   ///m5_team(demo1, Demo 1)
+   ///m5_team(demo3, Demo 1)
    m5_team(demo2, Demo 2)
    ///m5_team(sitting_duck, Sitting Duck)
    m5_team(trial, trial 1)
