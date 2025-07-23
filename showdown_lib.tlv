@@ -143,14 +143,6 @@
 
 \TLV verilog_wrapper(/_top, _github_id)
    \SV_plus
-      logic signed [7:0] energy [m5_SHIP_RANGE];
-      logic signed [7:0] x [m5_SHIP_RANGE];
-      logic signed [7:0] y [m5_SHIP_RANGE];
-      logic signed [7:0] enemy_x_p [m5_SHIP_RANGE];
-      logic signed [7:0] enemy_y_p [m5_SHIP_RANGE];
-      logic signed [3:0] x_a [m5_SHIP_RANGE];
-      logic signed [3:0] y_a [m5_SHIP_RANGE];
-      logic [1:0] fire_dir [m5_SHIP_RANGE];
       team_['']_github_id team_['']_github_id(
          // Inputs:
          .clk(clk),
