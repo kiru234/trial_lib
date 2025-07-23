@@ -636,6 +636,10 @@
    /ship[*]
       $xx_acc[0] = 4'b1;
       $yy_acc[0] = 4'b1;
+\TLV trial(/_top)
+   /ship[*]
+      $xx_acc[3:0] = 4'b1;
+      $yy_acc[3:0] = 4'b1;
 
 \TLV team_trial_viz(/_top, _team_num)
    // Visualize IOs.
