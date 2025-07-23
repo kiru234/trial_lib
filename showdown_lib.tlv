@@ -630,7 +630,7 @@
 \TLV team_demo2_viz(/_top, _team_num)
    // Visualize IOs.
    m5+io_viz_only(/_top, _team_num)
-
+\TLV team_trial(/_top)
 \SV
 module team_trial (
    );
@@ -1532,6 +1532,5 @@ module team_trial (
    *failed = /secret$failed;
 \SV
    endmodule
-\TLV team_trial(/_top)
-   m5+verilog_wrapper(/_top, trial)
+
 
