@@ -632,7 +632,6 @@
    m5+io_viz_only(/_top, _team_num)
 
 //add our team here for testing guyss
-\TLV
 \SV team_trial(/_top)
 localparam signed [7:0] BORDER = 32;
 localparam signed [7:0] MARGIN = 2;
