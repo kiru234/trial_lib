@@ -632,6 +632,7 @@
    m5+io_viz_only(/_top, _team_num)
 
 //add our team here for testing guyss
+\TLV
 \SV team_trial(/_top)
 localparam signed [7:0] BORDER = 32;
 localparam signed [7:0] MARGIN = 2;
@@ -789,23 +790,6 @@ endgenerate
 \TLV team_trial_viz(/_top, _team_num)
    // Visualize IOs.
    m5+io_viz(/_top, _team_num)
-   
-   // Visualize your logic, if you like, here, within the bounds {left: 0..100, top: 0..100}.
-   \viz_js
-      m5_DefaultTeamVizBoxAndWhere()
-      init() {
-         return {
-            note: new fabric.Text("I''m so random!", {
-               left: 10, top: 50, originY: "center", fill: "black", fontSize: 10,
-            }),
-            full: new fabric.Rect({
-               left: 0, top: 0, width: 100, height: 100, strokeWidth: 0, fill: "#0000FF20",
-            }),
-         };
-      },
-      render() {
-         // ... draw using fabric.js and signal values. (See VIZ docs under "LEARN" menu.)
-      },
 
 // An opponent that uses default values (and thus, the ships do absolutely nothing).
 \TLV team_sitting_duck(/_top)
