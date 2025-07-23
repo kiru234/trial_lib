@@ -634,8 +634,196 @@
 //add our team here for testing guyss
 \TLV team_trial(/_top)
    /ship[*]
-   $xx_acc[0] = 4'b1;
-   $yy_acc[0] = 4'b1;
+      $xx_acc[7:0] = #ship == 0 ?
+                      *cyc_cnt == 1 ? (8'd3) :
+                      *cyc_cnt == 2 ? (8'd3) :
+                      *cyc_cnt == 3 ? (8'd2) :
+                      *cyc_cnt == 5 ? (-8'd2) :
+                      *cyc_cnt == 6 ? (-8'd2) :
+                      *cyc_cnt == 7 ? (-8'd1) :
+                      *cyc_cnt == 8 ? (-8'd1) :
+                      *cyc_cnt == 9 ? (8'd2) :
+                      *cyc_cnt == 10 ? (8'd2) :
+                      *cyc_cnt == 12 ? (-8'd1) :
+                      *cyc_cnt == 13 ? (-8'd3) :
+                      *cyc_cnt == 14 ? (-8'd1) :
+                      *cyc_cnt == 15 ? (-8'd1) :
+                      8'd0 :
+                   #ship == 1 ?
+                      *cyc_cnt == 1 ? (8'd3) :
+                      *cyc_cnt == 2 ? (8'd3) :
+                      *cyc_cnt == 3 ? (8'd1) :
+                      *cyc_cnt == 4 ? (-8'd3) :
+                      *cyc_cnt == 5 ? (-8'd2) :
+                      *cyc_cnt == 7 ? (8'd1) :
+                      *cyc_cnt == 8 ? (-8'd1) :
+                      *cyc_cnt == 9 ? (8'd1) :
+                      *cyc_cnt == 10 ? (8'd3) :
+                      8'd0 :
+                   *cyc_cnt == 1 ? (8'd3) :
+                   *cyc_cnt == 2 ? (8'd3) :
+                   *cyc_cnt == 3 ? (8'd1) :
+                   *cyc_cnt == 7 ? (-8'd1) :
+                   *cyc_cnt == 8 ? (-8'd2) :
+                   *cyc_cnt == 9 ? (-8'd2) :
+                   *cyc_cnt == 10 ? (-8'd1) :
+                   *cyc_cnt == 11 ? (-8'd1) :
+                   *cyc_cnt == 13 ? (8'd1) :
+                   *cyc_cnt == 14 ? (8'd1) :
+                   8'd0;
+      
+      $yy_acc[3:0] = #ship == 0 ?
+                      *cyc_cnt == 1 ? (8'd2) :
+                      *cyc_cnt == 2 ? (8'd1) :
+                      *cyc_cnt == 8 ? (-8'd1) :
+                      *cyc_cnt == 9 ? (-8'd3) :
+                      *cyc_cnt == 10 ? (-8'd2) :
+                      *cyc_cnt == 11 ? (8'd1) :
+                      *cyc_cnt == 12 ? (8'd3) :
+                      *cyc_cnt == 13 ? (8'd3) :
+                      *cyc_cnt == 14 ? (8'd1) :
+                      *cyc_cnt == 16 ? (-8'd1) :
+                      *cyc_cnt == 17 ? (-8'd3) :
+                      *cyc_cnt == 18 ? (-8'd3) :
+                      *cyc_cnt == 19 ? (-8'd2) :
+                      *cyc_cnt == 20 ? (-8'd1) :
+                      8'd0 :
+                   #ship == 1 ?
+                      *cyc_cnt == 1 ? (8'd3) :
+                      *cyc_cnt == 2 ? (8'd3) :
+                      *cyc_cnt == 3 ? (8'd1) :
+                      *cyc_cnt == 7 ? (-8'd1) :
+                      *cyc_cnt == 8 ? (-8'd2) :
+                      *cyc_cnt == 9 ? (-8'd2) :
+                      *cyc_cnt == 10 ? (-8'd2) :
+                      8'd0 :
+                   *cyc_cnt == 4 ? (8'd1) :
+                   *cyc_cnt == 5 ? (8'd1) :
+                   *cyc_cnt == 6 ? (8'd1) :
+                   *cyc_cnt == 7 ? (8'd1) :
+                   *cyc_cnt == 8 ? (8'd1) :
+                   *cyc_cnt == 9 ? (8'd1) :
+                   *cyc_cnt == 10 ? (8'd1) :
+                   *cyc_cnt == 13 ? (8'd1) :
+                   8'd0;
+      
+      
+      
+      $attempt_fire = #ship == 0 ?
+                         (*cyc_cnt == 7) || (*cyc_cnt == 17) :
+                      #ship == 1 ?
+                         (*cyc_cnt == 4) :
+                      (*cyc_cnt == 6) || (*cyc_cnt == 16);
+      
+      $fire_dir[1:0] = #ship == 0 ?
+                          2'b11 :
+                       #ship == 1 ?
+                          2'b11 :
+                       (*cyc_cnt == 16) ? 2'b10 : 2'b11;
+      
+      $attempt_shield = #ship == 0 ?
+                           (*cyc_cnt >= 16) && (*cyc_cnt <= 19) :
+                        #ship == 1 ?
+                           (*cyc_cnt == 5) || (*cyc_cnt == 6) :
+                        1'b0;
+      
+      $attempt_cloak = #ship == 0 ?
+                          (*cyc_cnt >= 4) && (*cyc_cnt <= 10) :
+                       #ship == 1 ?
+                          1'b0 :
+                       1'b0;
+      
+\TLV team_demo1_viz(/_top, _team_num)
+   // Visualize IOs.
+   m5+io_viz_only(/_top, _team_num)
+
+
+// Team logic providing demo second player behavior.
+\TLV team_demo2(/_top)
+   /ship[*]
+      $xx_acc[7:0] = #ship == 0 ?
+                      *cyc_cnt == 1 ? (-8'd3) :
+                      *cyc_cnt == 2 ? (-8'd2) :
+                      *cyc_cnt == 3 ? (-8'd1) :
+                      *cyc_cnt == 4 ? (8'd3) :
+                      *cyc_cnt == 5 ? (8'd3) :
+                      *cyc_cnt == 6 ? (8'd3) :
+                      *cyc_cnt == 7 ? (8'd3) :
+                      *cyc_cnt == 11 ? (-8'd2) :
+                      *cyc_cnt == 12 ? (-8'd3) :
+                      *cyc_cnt == 13 ? (-8'd3) :
+                      *cyc_cnt == 14 ? (8'd3) :
+                      *cyc_cnt == 15 ? (8'd2) :
+                      *cyc_cnt == 16 ? (-8'd3) :
+                      *cyc_cnt == 19 ? (8'd1) :
+                      *cyc_cnt == 20 ? (8'd1) :
+                      8'd0 :
+                   #ship == 1 ?
+                      *cyc_cnt == 1 ? (8'd3) :
+                      *cyc_cnt == 2 ? (8'd3) :
+                      *cyc_cnt == 3 ? (8'd1) :
+                      *cyc_cnt == 7 ? (-8'd2) :
+                      *cyc_cnt == 8 ? (8'd0) :
+                      8'd0 :
+                   *cyc_cnt == 1 ? (8'd3) :
+                   *cyc_cnt == 2 ? (8'd3) :
+                   *cyc_cnt == 3 ? (8'd1) :
+                   8'd0;
+      
+      $yy_acc[3:0] = #ship == 0 ?
+                      *cyc_cnt == 1 ? (-8'd3) :
+                      *cyc_cnt == 2 ? (-8'd2) :
+                      *cyc_cnt == 3 ? (8'd1) :
+                      *cyc_cnt == 4 ? (8'd1) :
+                      *cyc_cnt == 6 ? (8'd3) :
+                      *cyc_cnt == 11 ? (8'd2) :
+                      *cyc_cnt == 12 ? (8'd2) :
+                      *cyc_cnt == 14 ? (8'd3) :
+                      *cyc_cnt == 15 ? (-8'd1) :
+                      *cyc_cnt == 16 ? (-8'd2) :
+                      *cyc_cnt == 17 ? (8'd3) :
+                      *cyc_cnt == 18 ? (8'd2) :
+                      8'd0 :
+                   #ship == 1 ?
+                      *cyc_cnt == 1 ? (8'd1) :
+                      *cyc_cnt == 2 ? (8'd2) :
+                      *cyc_cnt == 5 ? (-8'd2) :
+                      *cyc_cnt == 6 ? (-8'd2) :
+                      *cyc_cnt == 7 ? (-8'd1) :
+                      8'd0 :
+                   *cyc_cnt == 1 ? (-8'd1) :
+                   *cyc_cnt == 2 ? (-8'd1) :
+                   *cyc_cnt == 4 ? (8'd1) :
+                   *cyc_cnt == 5 ? (8'd2) :
+                   *cyc_cnt == 6 ? (8'd2) :
+                   8'd0;
+      
+      
+      $attempt_fire = #ship == 0 ?
+                         (*cyc_cnt == 5) || (*cyc_cnt == 15) || (*cyc_cnt == 18) :
+                      #ship == 1 ?
+                         (*cyc_cnt == 8) :
+                      (*cyc_cnt == 5);
+      
+      $fire_dir[1:0] = #ship == 0 ?
+                          (*cyc_cnt == 15) ? 2'b10 :
+                          (*cyc_cnt == 18) ? 2'b11 :
+                          2'b00 :
+                       #ship == 1 ?
+                          2'b1 :
+                       2'b11;
+      
+      $attempt_shield = #ship == 0 ?
+                         (*cyc_cnt >= 8) && (*cyc_cnt <= 13) :
+                      #ship == 1 ?
+                         1'b0 :
+                      1'b0;
+      
+      $attempt_cloak = #ship == 0 ?
+                          1'b0 :
+                       #ship == 1 ?
+                          1'b0 :
+                       (*cyc_cnt >= 4);
 
 \TLV team_trial_viz(/_top, _team_num)
    // Visualize IOs.
