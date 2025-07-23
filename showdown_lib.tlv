@@ -434,8 +434,9 @@
 
 
 // An opponent providing demo first-player behavior.
-\SV team_demo1(/_top)
-   localparam signed [7:0] BORDER = 32;
+\TLV team_demo1(/_top)
+\SV
+localparam signed [7:0] BORDER = 32;
 localparam signed [7:0] MARGIN = 2;
 
 localparam FIRE_COST = 30;
