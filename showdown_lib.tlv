@@ -647,13 +647,10 @@ module team_trial (
       output logic [1:0] fire_dir [m5_SHIP_RANGE]   // Direction to fire (if firing). (For the first player: 0 = right, 1 = down, 2 = left, 3 = up)
    );
    
-  assign x_a = '{default: 0};
-assign y_a = '{default: 0};
-assign attempt_fire = '{default: 1};
-assign attempt_shield = '{default: 0};
-assign attempt_cloak = '{default: 0};
-assign fire_dir = '{default: 0};
-endmodule
+  for (genvar ship = 0; ship < 3; ship++) begin
+      assign x_a[ship] = 4'd1;
+   end
+   endmodule
 
 \TLV team_trial_viz(/_top, _team_num)
    // Visualize IOs.
