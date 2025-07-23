@@ -431,163 +431,97 @@
          // ... draw using fabric.js and signal values. (See VIZ docs under "LEARN" menu.)
       },
 
-
-
 // An opponent providing demo first-player behavior.
 \TLV team_demo1(/_top)
-\SV
-localparam signed [7:0] BORDER = 32;
-localparam signed [7:0] MARGIN = 2;
+   /ship[*]
+      // Parameters
+      let BORDER = 32;
+      let MARGIN = 2;
+      let FIRE_COST = 30;
+      let CLOAK_COST = 15;
+      let SHIELD_COST = 25;
+      let BULLET_SPEED = 9;
+      let BULLET_TIME = 5;
+      let BULLET_RANGE = BULLET_SPEED * BULLET_TIME;
+      let FIRE_RANGE_SQ = 2500;
 
-localparam FIRE_COST = 30;
-localparam CLOAK_COST = 15;
-localparam SHIELD_COST = 25;
-localparam BULLET_SPEED = 9;
-localparam BULLET_TIME = 5;
-localparam BULLET_RANGE = BULLET_SPEED * BULLET_TIME; // 45 units
-localparam [15:0] FIRE_RANGE_SQ = 2500;
+      // Calculate this and last cycle's enemy positions
+      $dx0_now = /enemy_ship[0]$xx_p - $xx_p;
+      $dy0_now = /enemy_ship[0]$yy_p - $yy_p;
+      $dx1_now = /enemy_ship[1]$xx_p - $xx_p;
+      $dy1_now = /enemy_ship[1]$yy_p - $yy_p;
+      $dx2_now = /enemy_ship[2]$xx_p - $xx_p;
+      $dy2_now = /enemy_ship[2]$yy_p - $yy_p;
 
-logic signed [7:0] enemy_x_prev [2:0];
-logic signed [7:0] enemy_y_prev [2:0];
-logic [1:0] enemy_vx_sign [2:0];
-logic [1:0] enemy_vy_sign [2:0];
+      $dx0_prev = /enemy_ship[0]$xx_p[-1] - $xx_p[-1];
+      $dy0_prev = /enemy_ship[0]$yy_p[-1] - $yy_p[-1];
+      $dx1_prev = /enemy_ship[1]$xx_p[-1] - $xx_p[-1];
+      $dy1_prev = /enemy_ship[1]$yy_p[-1] - $yy_p[-1];
+      $dx2_prev = /enemy_ship[2]$xx_p[-1] - $xx_p[-1];
+      $dy2_prev = /enemy_ship[2]$yy_p[-1] - $yy_p[-1];
 
-integer j;
-always_ff @(posedge clk) begin
-    if (reset) begin
-        for (j = 0; j < 3; j++) begin
-            enemy_x_prev[j] <= 0;
-            enemy_y_prev[j] <= 0;
-            enemy_vx_sign[j] <= 2;
-            enemy_vy_sign[j] <= 2;
-        end
-    end else begin
-        for (j = 0; j < 3; j++) begin
-            logic signed [7:0] vx = enemy_x_p[j] - enemy_x_prev[j];
-            logic signed [7:0] vy = enemy_y_p[j] - enemy_y_prev[j];
-            enemy_vx_sign[j] <= (vx > 0) ? 1 : (vx < 0) ? 0 : 2;
-            enemy_vy_sign[j] <= (vy > 0) ? 1 : (vy < 0) ? 0 : 2;
-            enemy_x_prev[j] <= enemy_x_p[j];
-            enemy_y_prev[j] <= enemy_y_p[j];
-        end
-    end
-end
+      // Compute distance squared for all enemy ships
+      $dist_sq0 = $dx0_now * $dx0_now + $dy0_now * $dy0_now;
+      $dist_sq1 = $dx1_now * $dx1_now + $dy1_now * $dy1_now;
+      $dist_sq2 = $dx2_now * $dx2_now + $dy2_now * $dy2_now;
 
-genvar i;
-generate
-for (i = 0; i < 3; i++) begin : ship_logic
+      // Function: enemy alive & visible
+      $valid0 = !/enemy_ship[0]$destroyed && !/enemy_ship[0]$cloaked;
+      $valid1 = !/enemy_ship[1]$destroyed && !/enemy_ship[1]$cloaked;
+      $valid2 = !/enemy_ship[2]$destroyed && !/enemy_ship[2]$cloaked;
 
-    wire signed [7:0] dx0_now = enemy_x_p[0] - x[i];
-    wire signed [7:0] dy0_now = enemy_y_p[0] - y[i];
-    wire signed [7:0] dx1_now = enemy_x_p[1] - x[i];
-    wire signed [7:0] dy1_now = enemy_y_p[1] - y[i];
-    wire signed [7:0] dx2_now = enemy_x_p[2] - x[i];
-    wire signed [7:0] dy2_now = enemy_y_p[2] - y[i];
+      // Function: is target approaching?
+      $approaching0 = ($dist_sq0 < ($dx0_prev * $dx0_prev + $dy0_prev * $dy0_prev));
+      $approaching1 = ($dist_sq1 < ($dx1_prev * $dx1_prev + $dy1_prev * $dy1_prev));
+      $approaching2 = ($dist_sq2 < ($dx2_prev * $dx2_prev + $dy2_prev * $dy2_prev));
 
-    wire signed [7:0] dx0_prev = enemy_x_prev[0] - x[i];
-    wire signed [7:0] dy0_prev = enemy_y_prev[0] - y[i];
-    wire signed [7:0] dx1_prev = enemy_x_prev[1] - x[i];
-    wire signed [7:0] dy1_prev = enemy_y_prev[1] - y[i];
-    wire signed [7:0] dx2_prev = enemy_x_prev[2] - x[i];
-    wire signed [7:0] dy2_prev = enemy_y_prev[2] - y[i];
+      // Fire if a valid enemy is visible and approaching
+      $try_fire0 = $valid0 && $approaching0;
+      $try_fire1 = $valid1 && $approaching1;
+      $try_fire2 = $valid2 && $approaching2;
+      $attempt_fire = ($energy >= FIRE_COST) && ($try_fire0 || $try_fire1 || $try_fire2);
 
-    wire signed [7:0] vx0 = enemy_x_p[0] - enemy_x_prev[0];
-    wire signed [7:0] vy0 = enemy_y_p[0] - enemy_y_prev[0];
-    wire signed [7:0] vx1 = enemy_x_p[1] - enemy_x_prev[1];
-    wire signed [7:0] vy1 = enemy_y_p[1] - enemy_y_prev[1];
-    wire signed [7:0] vx2 = enemy_x_p[2] - enemy_x_prev[2];
-    wire signed [7:0] vy2 = enemy_y_p[2] - enemy_y_prev[2];
+      // Target ship for firing
+      $target =
+         $try_fire0 ? 0 :
+         $try_fire1 ? 1 :
+         $try_fire2 ? 2 : 0 ;
+      $dx_fire = /enemy_ship[$target]$xx_p - $xx_p;
+      $dy_fire = /enemy_ship[$target]$yy_p - $yy_p;
 
-    wire [7:0] abs_dx0 = dx0_now[7] ? -dx0_now : dx0_now;
-    wire [7:0] abs_dy0 = dy0_now[7] ? -dy0_now : dy0_now;
-    wire [7:0] abs_dx1 = dx1_now[7] ? -dx1_now : dx1_now;
-    wire [7:0] abs_dy1 = dy1_now[7] ? -dy1_now : dy1_now;
-    wire [7:0] abs_dx2 = dx2_now[7] ? -dx2_now : dx2_now;
-    wire [7:0] abs_dy2 = dy2_now[7] ? -dy2_now : dy2_now;
+      // Fire direction encoding (N/E/S/W-ish, as per original logic)
+      $fire_dir[1:0] =
+         (($dx_fire > $dy_fire) && ($dx_fire > -$dy_fire)) ? 2'd0 :
+         (($dx_fire < $dy_fire) && ($dx_fire > -$dy_fire)) ? 2'd3 :
+         (($dx_fire < $dy_fire) && ($dx_fire < -$dy_fire)) ? 2'd2 :
+                                                             2'd1 ;
 
-    wire [8:0] sum0 = abs_dx0 + abs_dy0;
-    wire [8:0] sum1 = abs_dx1 + abs_dy1;
-    wire [8:0] sum2 = abs_dx2 + abs_dy2;
+      // Acceleration to stay inside borders
+      $xx_a[3:0] = ($xx_p >= BORDER - MARGIN) ? -2 :
+                   ($xx_p <= -BORDER + MARGIN) ? 2 :
+                   ($dx_fire > 2) ? 2 : ($dx_fire < -2) ? -2 : $dx_fire;
 
-   // Unsigned squared distance
-    wire [15:0] dist_sq0 = dx0_now * dx0_now + dy0_now * dy0_now;
-    wire [15:0] dist_sq1 = dx1_now * dx1_now + dy1_now * dy1_now;
-    wire [15:0] dist_sq2 = dx2_now * dx2_now + dy2_now * dy2_now;
+      $yy_a[3:0] = ($yy_p >= BORDER - MARGIN) ? -2 :
+                   ($yy_p <= -BORDER + MARGIN) ? 2 :
+                   ($dy_fire > 2) ? 2 : ($dy_fire < -2) ? -2 : $dy_fire;
 
+      // Cloak and shield based on proximity
+      $enemy_sum0 = abs($dx0_now) + abs($dy0_now);
+      $enemy_sum1 = abs($dx1_now) + abs($dy1_now);
+      $enemy_sum2 = abs($dx2_now) + abs($dy2_now);
 
-    function is_approaching;
-        input signed [7:0] dx_now, dy_now, dx_prev, dy_prev;
-        begin
-            is_approaching =
-               ((dx_now*dx_now + dy_now*dy_now) < (dx_prev*dx_prev + dy_prev*dy_prev));
-        end
-    endfunction
+      $enemy_close0 = $valid0 && ($enemy_sum0 <= (BULLET_RANGE + 6));
+      $enemy_close1 = $valid1 && ($enemy_sum1 <= (BULLET_RANGE + 6));
+      $enemy_close2 = $valid2 && ($enemy_sum2 <= (BULLET_RANGE + 6));
+      $attempt_cloak = ($energy >= CLOAK_COST) && ($enemy_close0 || $enemy_close1 || $enemy_close2);
 
-    wire valid0 = !enemy_destroyed[0] && !enemy_cloaked[0];
-    wire valid1 = !enemy_destroyed[1] && !enemy_cloaked[1];
-    wire valid2 = !enemy_destroyed[2] && !enemy_cloaked[2];
+      $very_close0 = $valid0 && ($enemy_sum0 <= 12);
+      $very_close1 = $valid1 && ($enemy_sum1 <= 12);
+      $very_close2 = $valid2 && ($enemy_sum2 <= 12);
 
-    wire fire_on_0 = valid0 && ((is_approaching(dx0_now, dy0_now, dx0_prev, dy0_prev))  || (is_enemy_approaching_dir(dx0_now, dy0_now, enemy_vx_sign[0], enemy_vy_sign[0]))) ;
-    wire fire_on_1 = valid1 && ((is_approaching(dx1_now, dy1_now, dx1_prev, dy1_prev))  || (is_enemy_approaching_dir(dx1_now, dy1_now, enemy_vx_sign[1], enemy_vy_sign[1]))) ;
-    wire fire_on_2 = valid2 && ((is_approaching(dx2_now, dy2_now, dx2_prev, dy2_prev))  || (is_enemy_approaching_dir(dx2_now, dy2_now, enemy_vx_sign[2], enemy_vy_sign[2]))) ;
+      $attempt_shield = (($energy >= SHIELD_COST) && ($enemy_close0 || $enemy_close1 || $enemy_close2))
+                        || (($energy >= SHIELD_COST) && ($very_close0 || $very_close1 || $very_close2));
 
-    assign attempt_fire[i] = ((energy[i] >= FIRE_COST) && (fire_on_0 || fire_on_1 || fire_on_2));
-
-    wire [1:0] target = fire_on_0 ? 2'd0 : fire_on_1 ? 2'd1 : 2'd2;
-    wire signed [7:0] dx_fire = enemy_x_p[target] - x[i];
-    wire signed [7:0] dy_fire = enemy_y_p[target] - y[i];
-
-    assign fire_dir[i] = ( (dx_fire > dy_fire) && (dx_fire > -dy_fire) ) ? 2'd0 :
-                         ( (dx_fire < dy_fire) && (dx_fire > -dy_fire) ) ? 2'd3 :
-                         ( (dx_fire < dy_fire) && (dx_fire < -dy_fire) ) ? 2'd2 :
-                                                                          2'd1 ;
-
-
-
-    function is_enemy_approaching_dir;
-        input signed [7:0] dx, dy;
-        input [1:0] vx_s, vy_s;
-        begin
-            is_enemy_approaching_dir =
-                ((vx_s == 1 && dx < 0) || (vx_s == 0 && dx > 0) || (vx_s == 2 && dx !=0)) ||
-                ((vy_s == 1 && dy < 0) || (vy_s == 0 && dy > 0) || (vy_s == 2 && dy !=0));
-        end
-    endfunction
-
-    wire enemy_close0 = valid0 && (sum0 <= (BULLET_RANGE + 6)) && is_enemy_approaching_dir(dx0_now, dy0_now, enemy_vx_sign[0], enemy_vy_sign[0]) ;
-    wire enemy_close1 = valid1 && (sum1 <= (BULLET_RANGE + 6)) && is_enemy_approaching_dir(dx1_now, dy1_now, enemy_vx_sign[1], enemy_vy_sign[1]) ;
-    wire enemy_close2 = valid2 && (sum2 <= (BULLET_RANGE + 6)) && is_enemy_approaching_dir(dx2_now, dy2_now, enemy_vx_sign[2], enemy_vy_sign[2]) ;
-
-    assign attempt_cloak[i] = (energy[i] >= CLOAK_COST) && (enemy_close0 || enemy_close1 || enemy_close2);
-
-    wire very_close0 = valid0 && (sum0 <= 12);
-    wire very_close1 = valid1 && (sum1 <= 12);
-    wire very_close2 = valid2 && (sum2 <= 12);
-
-    assign attempt_shield[i] =
-        ((energy[i] >= SHIELD_COST) && (enemy_close0 || enemy_close1 || enemy_close2)) ||
-        ((energy[i] >= SHIELD_COST) && (very_close0 || very_close1 || very_close2));
-
-    wire signed [7:0] pred_dx =
-        (valid0 && (enemy_vx_sign[0] == 1)) ? dx0_now + 1 :
-        (valid0 && (enemy_vx_sign[0] == 0)) ? dx0_now - 1 : dx0_now;
-    wire signed [7:0] pred_dy =
-        (valid0 && (enemy_vy_sign[0] == 1)) ? dy0_now + 1 :
-        (valid0 && (enemy_vy_sign[0] == 0)) ? dy0_now - 1 : dy0_now;
-
-    wire signed [2:0] step_x = (pred_dx > 2) ? 2 : (pred_dx < -2) ? -2 : pred_dx[2:0];
-    wire signed [2:0] step_y = (pred_dy > 2) ? 2 : (pred_dy < -2) ? -2 : pred_dy[2:0];
-
-    assign x_a[i] = (x[i] >= BORDER - MARGIN) ? -2 :
-                    (x[i] <= -BORDER + MARGIN) ? 2 :
-                    step_x;
-
-    assign y_a[i] = (y[i] >= BORDER - MARGIN) ? -2 :
-                    (y[i] <= -BORDER + MARGIN) ? 2 :
-                    step_y;
-
-end
-endgenerate
       
 \TLV team_demo1_viz(/_top, _team_num)
    // Visualize IOs.
