@@ -444,84 +444,74 @@
       let BULLET_TIME = 5;
       let BULLET_RANGE = BULLET_SPEED * BULLET_TIME;
       let FIRE_RANGE_SQ = 2500;
+      let CENTER = 0;
 
-      // Calculate this and last cycle's enemy positions
-      $dx0_now = /enemy_ship[0]$xx_p - $xx_p;
-      $dy0_now = /enemy_ship[0]$yy_p - $yy_p;
-      $dx1_now = /enemy_ship[1]$xx_p - $xx_p;
-      $dy1_now = /enemy_ship[1]$yy_p - $yy_p;
-      $dx2_now = /enemy_ship[2]$xx_p - $xx_p;
-      $dy2_now = /enemy_ship[2]$yy_p - $yy_p;
+      // Calculate relative positions (now and previous step)
+      $dx_now_ary[3], $dy_now_ary[3], $dx_prev_ary[3], $dy_prev_ary[3];
+      $dist_sq_ary[3], $dist_sq_prev_ary[3];
+      $valid_ary[3], $approaching_ary[3];
 
-      $dx0_prev = /enemy_ship[0]$xx_p[-1] - $xx_p[-1];
-      $dy0_prev = /enemy_ship[0]$yy_p[-1] - $yy_p[-1];
-      $dx1_prev = /enemy_ship[1]$xx_p[-1] - $xx_p[-1];
-      $dy1_prev = /enemy_ship[1]$yy_p[-1] - $yy_p[-1];
-      $dx2_prev = /enemy_ship[2]$xx_p[-1] - $xx_p[-1];
-      $dy2_prev = /enemy_ship[2]$yy_p[-1] - $yy_p[-1];
+      // Populate arrays for all enemy ships
+      [i=0:2]
+         $dx_now_ary[i] = /enemy_ship[i]$xx_p - $xx_p;
+         $dy_now_ary[i] = /enemy_ship[i]$yy_p - $yy_p;
+         $dx_prev_ary[i] = /enemy_ship[i]$xx_p[-1] - $xx_p[-1];
+         $dy_prev_ary[i] = /enemy_ship[i]$yy_p[-1] - $yy_p[-1];
+         $dist_sq_ary[i] = $dx_now_ary[i] * $dx_now_ary[i] + $dy_now_ary[i] * $dy_now_ary[i];
+         $dist_sq_prev_ary[i] = $dx_prev_ary[i] * $dx_prev_ary[i] + $dy_prev_ary[i] * $dy_prev_ary[i];
+         $valid_ary[i] = !/enemy_ship[i]$destroyed && !/enemy_ship[i]$cloaked;
+         $approaching_ary[i] = $dist_sq_ary[i] < $dist_sq_prev_ary[i];
+      [/i]
 
-      // Compute distance squared for all enemy ships
-      $dist_sq0 = $dx0_now * $dx0_now + $dy0_now * $dy0_now;
-      $dist_sq1 = $dx1_now * $dx1_now + $dy1_now * $dy1_now;
-      $dist_sq2 = $dx2_now * $dx2_now + $dy2_now * $dy2_now;
+      // Identify nearest valid approaching enemy
+      $min_dist = 99999;
+      $nearest = -1;
+      [i=0:2]
+         $valid_attack = $valid_ary[i] && $approaching_ary[i];
+         $min_dist = ($valid_attack && ($dist_sq_ary[i] < $min_dist)) ? $dist_sq_ary[i] : $min_dist;
+         $nearest = ($valid_attack && ($dist_sq_ary[i] == $min_dist)) ? i : $nearest;
+      [/i]
 
-      // Function: enemy alive & visible
-      $valid0 = !/enemy_ship[0]$destroyed && !/enemy_ship[0]$cloaked;
-      $valid1 = !/enemy_ship[1]$destroyed && !/enemy_ship[1]$cloaked;
-      $valid2 = !/enemy_ship[2]$destroyed && !/enemy_ship[2]$cloaked;
+      // Default: bias towards board center
+      $dx_tgt = ($nearest != -1) ? $dx_now_ary[$nearest] : (CENTER - $xx_p);
+      $dy_tgt = ($nearest != -1) ? $dy_now_ary[$nearest] : (CENTER - $yy_p);
 
-      // Function: is target approaching?
-      $approaching0 = ($dist_sq0 < ($dx0_prev * $dx0_prev + $dy0_prev * $dy0_prev));
-      $approaching1 = ($dist_sq1 < ($dx1_prev * $dx1_prev + $dy1_prev * $dy1_prev));
-      $approaching2 = ($dist_sq2 < ($dx2_prev * $dx2_prev + $dy2_prev * $dy2_prev));
+      // Stay inside borders
+      $xx_a[3:0] =
+        ($xx_p >= BORDER - MARGIN) ? -2 :
+        ($xx_p <= -BORDER + MARGIN) ? 2 :
+        ($dx_tgt > 2) ? 2 : ($dx_tgt < -2) ? -2 : $dx_tgt;
 
-      // Fire if a valid enemy is visible and approaching
-      $try_fire0 = $valid0 && $approaching0;
-      $try_fire1 = $valid1 && $approaching1;
-      $try_fire2 = $valid2 && $approaching2;
-      $attempt_fire = ($energy >= FIRE_COST) && ($try_fire0 || $try_fire1 || $try_fire2);
+      $yy_a[3:0] =
+        ($yy_p >= BORDER - MARGIN) ? -2 :
+        ($yy_p <= -BORDER + MARGIN) ? 2 :
+        ($dy_tgt > 2) ? 2 : ($dy_tgt < -2) ? -2 : $dy_tgt;
 
-      // Target ship for firing
-      $target =
-         $try_fire0 ? 0 :
-         $try_fire1 ? 1 :
-         $try_fire2 ? 2 : 0 ;
-      $dx_fire = /enemy_ship[$target]$xx_p - $xx_p;
-      $dy_fire = /enemy_ship[$target]$yy_p - $yy_p;
+      // Fire control (as before)
+      $attempt_fire = ($energy >= FIRE_COST) && ($nearest != -1);
 
-      // Fire direction encoding (N/E/S/W-ish, as per original logic)
+      // Determine firing target and direction
       $fire_dir[1:0] =
-         (($dx_fire > $dy_fire) && ($dx_fire > -$dy_fire)) ? 2'd0 :
-         (($dx_fire < $dy_fire) && ($dx_fire > -$dy_fire)) ? 2'd3 :
-         (($dx_fire < $dy_fire) && ($dx_fire < -$dy_fire)) ? 2'd2 :
-                                                             2'd1 ;
+         ($nearest == -1) ? 2'd0 :
+         (($dx_now_ary[$nearest] > $dy_now_ary[$nearest] && $dx_now_ary[$nearest] > -$dy_now_ary[$nearest]) ? 2'd0 :
+         (($dx_now_ary[$nearest] < $dy_now_ary[$nearest] && $dx_now_ary[$nearest] > -$dy_now_ary[$nearest]) ? 2'd3 :
+         (($dx_now_ary[$nearest] < $dy_now_ary[$nearest] && $dx_now_ary[$nearest] < -$dy_now_ary[$nearest]) ? 2'd2 :
+          2'd1 )));
 
-      // Acceleration to stay inside borders
-      $xx_a[3:0] = ($xx_p >= BORDER - MARGIN) ? -2 :
-                   ($xx_p <= -BORDER + MARGIN) ? 2 :
-                   ($dx_fire > 2) ? 2 : ($dx_fire < -2) ? -2 : $dx_fire;
+      // Cloak and shield logic (same as before)
+      $enemy_sum_ary[3], $enemy_close_ary[3], $very_close_ary[3];
+      [i=0:2]
+         $enemy_sum_ary[i] = abs($dx_now_ary[i]) + abs($dy_now_ary[i]);
+         $enemy_close_ary[i] = $valid_ary[i] && ($enemy_sum_ary[i] <= (BULLET_RANGE + 6));
+         $very_close_ary[i] = $valid_ary[i] && ($enemy_sum_ary[i] <= 12);
+      [/i]
 
-      $yy_a[3:0] = ($yy_p >= BORDER - MARGIN) ? -2 :
-                   ($yy_p <= -BORDER + MARGIN) ? 2 :
-                   ($dy_fire > 2) ? 2 : ($dy_fire < -2) ? -2 : $dy_fire;
+      $attempt_cloak = ($energy >= CLOAK_COST) && 
+         ($enemy_close_ary[0] || $enemy_close_ary[1] || $enemy_close_ary[2]);
 
-      // Cloak and shield based on proximity
-      $enemy_sum0 = abs($dx0_now) + abs($dy0_now);
-      $enemy_sum1 = abs($dx1_now) + abs($dy1_now);
-      $enemy_sum2 = abs($dx2_now) + abs($dy2_now);
-
-      $enemy_close0 = $valid0 && ($enemy_sum0 <= (BULLET_RANGE + 6));
-      $enemy_close1 = $valid1 && ($enemy_sum1 <= (BULLET_RANGE + 6));
-      $enemy_close2 = $valid2 && ($enemy_sum2 <= (BULLET_RANGE + 6));
-      $attempt_cloak = ($energy >= CLOAK_COST) && ($enemy_close0 || $enemy_close1 || $enemy_close2);
-
-      $very_close0 = $valid0 && ($enemy_sum0 <= 12);
-      $very_close1 = $valid1 && ($enemy_sum1 <= 12);
-      $very_close2 = $valid2 && ($enemy_sum2 <= 12);
-
-      $attempt_shield = (($energy >= SHIELD_COST) && ($enemy_close0 || $enemy_close1 || $enemy_close2))
-                        || (($energy >= SHIELD_COST) && ($very_close0 || $very_close1 || $very_close2));
-
+      $attempt_shield =
+         (($energy >= SHIELD_COST) && ($enemy_close_ary[0] || $enemy_close_ary[1] || $enemy_close_ary[2])) ||
+         (($energy >= SHIELD_COST) && ($very_close_ary[0] || $very_close_ary[1] || $very_close_ary[2]));
       
 \TLV team_demo1_viz(/_top, _team_num)
    // Visualize IOs.
