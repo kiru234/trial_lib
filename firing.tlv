@@ -24,8 +24,8 @@
                          /// Use "devel" or "demo". ("demo" will be used in competition.)
 
 
-   macro(team_team1_module, ['
-      module team_team1 (
+   macro(team_opp_team_module, ['
+      module team_opp_team (
          // Inputs:
          input logic clk, input logic reset,
          input logic signed [7:0] x [m5_SHIP_RANGE], input logic signed [7:0] y [m5_SHIP_RANGE],   // Positions of your ships, as affected by last cycle's acceleration.
@@ -206,7 +206,7 @@ endgenerate
 
 // [Optional]
 // Visualization of your logic for each ship.
-\TLV team_team1_viz(/_top, _team_num)
+\TLV team_opp_team_viz(/_top, _team_num)
    m5+io_viz(/_top, _team_num)   /// Visualization of your IOs.
    \viz_js
       m5_DefaultTeamVizBoxAndWhere()
@@ -214,7 +214,7 @@ endgenerate
       render() {
          // ... draw using fabric.js and signal values. (See VIZ docs under "LEARN" menu.)
          // For example...
-         const destroyed = (this.sigVal("team_team1.destroyed").asInt() >> this.getIndex("ship")) & 1;
+         const destroyed = (this.sigVal("team_opp_team.destroyed").asInt() >> this.getIndex("ship")) & 1;
          return [
             new fabric.Text(destroyed ? "I''m dead! ☹️" : "I''m alive! 😊", {
                left: 10, top: 50, originY: "center", fill: "black", fontSize: 10,
@@ -223,8 +223,8 @@ endgenerate
       },
 
 
-\TLV team_team1(/_top)
-   m5+verilog_wrapper(/_top, team1)
+\TLV team_opp_team(/_top)
+   m5+verilog_wrapper(/_top, opp_team)
 
 
 
@@ -239,7 +239,7 @@ endgenerate
    // Your team as the first player. Provide:
    //   - your GitHub ID, (as in your \TLV team_* macro, above)
    //   - your team name--anything you like (that isn't crude or disrespectful)
-   m5_team(team1, team1)
+   m5_team(opp_team, opp_team)
    
    
    // Choose your opponent.
