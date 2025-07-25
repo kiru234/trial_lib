@@ -12,7 +12,7 @@
    / Use the latest template for submission.
    /
    / Just 3 steps:
-   /   - Replace all kiru and kiru.
+   /   - Replace all YOUR_GITHUB_ID and YOUR_TEAM_NAME.
    /   - Code your logic in the module below.
    /   - Submit by Sun. July 26, 11 PM IST/1:30 PM EDT.
    /
@@ -24,8 +24,8 @@
                          /// Use "devel" or "demo". ("demo" will be used in competition.)
 
 
-   macro(team_kiru_module, ['
-      module team_kiru (
+   macro(team_YOUR_GITHUB_ID_module, ['
+      module team_YOUR_GITHUB_ID (
          // Inputs:
          input logic clk, input logic reset,
          input logic signed [7:0] x [m5_SHIP_RANGE], input logic signed [7:0] y [m5_SHIP_RANGE],   // Positions of your ships, as affected by last cycle's acceleration.
@@ -206,7 +206,7 @@ endgenerate
 
 // [Optional]
 // Visualization of your logic for each ship.
-\TLV team_kiru_viz(/_top, _team_num)
+\TLV team_YOUR_GITHUB_ID_viz(/_top, _team_num)
    m5+io_viz(/_top, _team_num)   /// Visualization of your IOs.
    \viz_js
       m5_DefaultTeamVizBoxAndWhere()
@@ -214,7 +214,7 @@ endgenerate
       render() {
          // ... draw using fabric.js and signal values. (See VIZ docs under "LEARN" menu.)
          // For example...
-         const destroyed = (this.sigVal("team_kiru.destroyed").asInt() >> this.getIndex("ship")) & 1;
+         const destroyed = (this.sigVal("team_YOUR_GITHUB_ID.destroyed").asInt() >> this.getIndex("ship")) & 1;
          return [
             new fabric.Text(destroyed ? "I''m dead! ☹️" : "I''m alive! 😊", {
                left: 10, top: 50, originY: "center", fill: "black", fontSize: 10,
@@ -223,8 +223,8 @@ endgenerate
       },
 
 
-\TLV team_kiru(/_top)
-   m5+verilog_wrapper(/_top, kiru)
+\TLV team_YOUR_GITHUB_ID(/_top)
+   m5+verilog_wrapper(/_top, YOUR_GITHUB_ID)
 
 
 
@@ -239,7 +239,7 @@ endgenerate
    // Your team as the first player. Provide:
    //   - your GitHub ID, (as in your \TLV team_* macro, above)
    //   - your team name--anything you like (that isn't crude or disrespectful)
-   m5_team(kiru, kiru)
+   m5_team(YOUR_GITHUB_ID, YOUR_TEAM_NAME)
    
    
    // Choose your opponent.
