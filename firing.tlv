@@ -12,7 +12,7 @@
    / Use the latest template for submission.
    /
    / Just 3 steps:
-   /   - Replace all YOUR_GITHUB_ID and YOUR_TEAM_NAME.
+   /   - Replace all kiru and kiru.
    /   - Code your logic in the module below.
    /   - Submit by Sun. July 26, 11 PM IST/1:30 PM EDT.
    /
@@ -206,7 +206,7 @@ endgenerate
 
 // [Optional]
 // Visualization of your logic for each ship.
-\TLV team_YOUR_GITHUB_ID_viz(/_top, _team_num)
+\TLV team_kiru_viz(/_top, _team_num)
    m5+io_viz(/_top, _team_num)   /// Visualization of your IOs.
    \viz_js
       m5_DefaultTeamVizBoxAndWhere()
@@ -214,7 +214,7 @@ endgenerate
       render() {
          // ... draw using fabric.js and signal values. (See VIZ docs under "LEARN" menu.)
          // For example...
-         const destroyed = (this.sigVal("team_YOUR_GITHUB_ID.destroyed").asInt() >> this.getIndex("ship")) & 1;
+         const destroyed = (this.sigVal("team_kiru.destroyed").asInt() >> this.getIndex("ship")) & 1;
          return [
             new fabric.Text(destroyed ? "I''m dead! ☹️" : "I''m alive! 😊", {
                left: 10, top: 50, originY: "center", fill: "black", fontSize: 10,
@@ -223,8 +223,8 @@ endgenerate
       },
 
 
-\TLV team_YOUR_GITHUB_ID(/_top)
-   m5+verilog_wrapper(/_top, YOUR_GITHUB_ID)
+\TLV team_kiru(/_top)
+   m5+verilog_wrapper(/_top, kiru)
 
 
 
