@@ -1,4 +1,4 @@
-\m5_TLV_version 1d: tl-x.org
+\m5_TLV_version 1d: tl-x1.org
 \m5
    / A competition template for:
    / my logic
@@ -27,13 +27,13 @@
    macro(team_swarna_module, ['
       module team_swarna (
          // Inputs:
-         input logic clk, input logic reset,
-         input logic signed [7:0] x [m5_SHIP_RANGE], input logic signed [7:0] y [m5_SHIP_RANGE],   // Positions of your ships, as affected by last cycle's acceleration.
-         input logic [7:0] energy [m5_SHIP_RANGE],   // The energy supply of each ship, as affected by last cycle's actions.
-         input logic [m5_SHIP_RANGE] destroyed,   // Asserted if and when the ships are destroyed.
-         input logic signed [7:0] enemy_x_p [m5_SHIP_RANGE], input logic signed [7:0] enemy_y_p [m5_SHIP_RANGE],   // Positions of enemy ships as affected by their acceleration last cycle.
-         input logic [m5_SHIP_RANGE] enemy_cloaked,   // Whether the enemy ships are cloaked, in which case their enemy_x_p and enemy_y_p will not update.
-         input logic [m5_SHIP_RANGE] enemy_destroyed, // Whether the enemy ships have been destroyed.
+         input logic clk1, input logic reset1,
+         input logic signed [7:0] x1 [m5_SHIP_RANGE], input logic signed [7:0] y1 [m5_SHIP_RANGE],   // Positions of your ships, as affected by last cycle's acceleration.
+         input logic [7:0] energy1 [m5_SHIP_RANGE],   // The energy1 supply of each ship, as affected by last cycle's actions.
+         input logic [m5_SHIP_RANGE] destroyed1,   // Asserted if and when the ships are destroyed1.
+         input logic signed [7:0] enemy_x_p1 [m5_SHIP_RANGE], input logic signed [7:0] enemy_y_p1 [m5_SHIP_RANGE],   // Positions of enemy ships as affected by their acceleration last cycle.
+         input logic [m5_SHIP_RANGE] enemy_cloaked1,   // Whether the enemy ships are cloaked, in which case their enemy_x_p1 and enemy_y_p1 will not update.
+         input logic [m5_SHIP_RANGE] enemy_destroyed1, // Whether the enemy ships have been destroyed1.
          // Outputs:
          output logic signed [3:0] x_a [m5_SHIP_RANGE], output logic signed [3:0] y_a [m5_SHIP_RANGE],  // Attempted acceleration for each of your ships; capped by max_acceleration (see showdown_lib.tlv).
          output logic [m5_SHIP_RANGE] attempt_fire, output logic [m5_SHIP_RANGE] attempt_shield, output logic [m5_SHIP_RANGE] attempt_cloak,  // Attempted actions for each of your ships.
@@ -57,8 +57,8 @@ logic [1:0] enemy_vx_sign [2:0];
 logic [1:0] enemy_vy_sign [2:0];
 
 integer j;
-always_ff @(posedge clk) begin
-    if (reset) begin
+always_ff @(posedge clk1) begin
+    if (reset1) begin
         for (j = 0; j < 3; j++) begin
             enemy_x_prev[j] <= 0;
             enemy_y_prev[j] <= 0;
@@ -67,12 +67,12 @@ always_ff @(posedge clk) begin
         end
     end else begin
         for (j = 0; j < 3; j++) begin
-            logic signed [7:0] vx = enemy_x_p[j] - enemy_x_prev[j];
-            logic signed [7:0] vy = enemy_y_p[j] - enemy_y_prev[j];
+            logic signed [7:0] vx = enemy_x_p1[j] - enemy_x_prev[j];
+            logic signed [7:0] vy = enemy_y_p1[j] - enemy_y_prev[j];
             enemy_vx_sign[j] <= (vx > 0) ? 1 : (vx < 0) ? 0 : 2;
             enemy_vy_sign[j] <= (vy > 0) ? 1 : (vy < 0) ? 0 : 2;
-            enemy_x_prev[j] <= enemy_x_p[j];
-            enemy_y_prev[j] <= enemy_y_p[j];
+            enemy_x_prev[j] <= enemy_x_p1[j];
+            enemy_y_prev[j] <= enemy_y_p1[j];
         end
     end
 end
@@ -81,26 +81,26 @@ genvar i;
 generate
 for (i = 0; i < 3; i++) begin : ship_logic
 
-    wire signed [7:0] dx0_now = enemy_x_p[0] - x[i];
-    wire signed [7:0] dy0_now = enemy_y_p[0] - y[i];
-    wire signed [7:0] dx1_now = enemy_x_p[1] - x[i];
-    wire signed [7:0] dy1_now = enemy_y_p[1] - y[i];
-    wire signed [7:0] dx2_now = enemy_x_p[2] - x[i];
-    wire signed [7:0] dy2_now = enemy_y_p[2] - y[i];
+    wire signed [7:0] dx0_now = enemy_x_p1[0] - x1[i];
+    wire signed [7:0] dy0_now = enemy_y_p1[0] - y1[i];
+    wire signed [7:0] dx1_now = enemy_x_p1[1] - x1[i];
+    wire signed [7:0] dy1_now = enemy_y_p1[1] - y1[i];
+    wire signed [7:0] dx2_now = enemy_x_p1[2] - x1[i];
+    wire signed [7:0] dy2_now = enemy_y_p1[2] - y1[i];
 
-    wire signed [7:0] dx0_prev = enemy_x_prev[0] - x[i];
-    wire signed [7:0] dy0_prev = enemy_y_prev[0] - y[i];
-    wire signed [7:0] dx1_prev = enemy_x_prev[1] - x[i];
-    wire signed [7:0] dy1_prev = enemy_y_prev[1] - y[i];
-    wire signed [7:0] dx2_prev = enemy_x_prev[2] - x[i];
-    wire signed [7:0] dy2_prev = enemy_y_prev[2] - y[i];
+    wire signed [7:0] dx0_prev = enemy_x_prev[0] - x1[i];
+    wire signed [7:0] dy0_prev = enemy_y_prev[0] - y1[i];
+    wire signed [7:0] dx1_prev = enemy_x_prev[1] - x1[i];
+    wire signed [7:0] dy1_prev = enemy_y_prev[1] - y1[i];
+    wire signed [7:0] dx2_prev = enemy_x_prev[2] - x1[i];
+    wire signed [7:0] dy2_prev = enemy_y_prev[2] - y1[i];
 
-    wire signed [7:0] vx0 = enemy_x_p[0] - enemy_x_prev[0];
-    wire signed [7:0] vy0 = enemy_y_p[0] - enemy_y_prev[0];
-    wire signed [7:0] vx1 = enemy_x_p[1] - enemy_x_prev[1];
-    wire signed [7:0] vy1 = enemy_y_p[1] - enemy_y_prev[1];
-    wire signed [7:0] vx2 = enemy_x_p[2] - enemy_x_prev[2];
-    wire signed [7:0] vy2 = enemy_y_p[2] - enemy_y_prev[2];
+    wire signed [7:0] vx0 = enemy_x_p1[0] - enemy_x_prev[0];
+    wire signed [7:0] vy0 = enemy_y_p1[0] - enemy_y_prev[0];
+    wire signed [7:0] vx1 = enemy_x_p1[1] - enemy_x_prev[1];
+    wire signed [7:0] vy1 = enemy_y_p1[1] - enemy_y_prev[1];
+    wire signed [7:0] vx2 = enemy_x_p1[2] - enemy_x_prev[2];
+    wire signed [7:0] vy2 = enemy_y_p1[2] - enemy_y_prev[2];
 
     wire [7:0] abs_dx0 = dx0_now[7] ? -dx0_now : dx0_now;
     wire [7:0] abs_dy0 = dy0_now[7] ? -dy0_now : dy0_now;
@@ -127,9 +127,9 @@ for (i = 0; i < 3; i++) begin : ship_logic
         end
     endfunction
 
-    wire valid0 = !enemy_destroyed[0] && !enemy_cloaked[0];
-    wire valid1 = !enemy_destroyed[1] && !enemy_cloaked[1];
-    wire valid2 = !enemy_destroyed[2] && !enemy_cloaked[2];
+    wire valid0 = !enemy_destroyed1[0] && !enemy_cloaked1[0];
+    wire valid1 = !enemy_destroyed1[1] && !enemy_cloaked1[1];
+    wire valid2 = !enemy_destroyed1[2] && !enemy_cloaked1[2];
 
     wire fire_on_0 = valid0 && ((is_approaching(dx0_now, dy0_now, dx0_prev, dy0_prev))  || (is_enemy_approaching_dir(dx0_now, dy0_now, enemy_vx_sign[0], enemy_vy_sign[0]))) ;
     wire fire_on_1 = valid1 && ((is_approaching(dx1_now, dy1_now, dx1_prev, dy1_prev))  || (is_enemy_approaching_dir(dx1_now, dy1_now, enemy_vx_sign[1], enemy_vy_sign[1]))) ;
@@ -137,8 +137,8 @@ for (i = 0; i < 3; i++) begin : ship_logic
 
 
     wire [1:0] target = fire_on_0 ? 2'd0 : fire_on_1 ? 2'd1 : 2'd2;
-    wire signed [7:0] dx_fire = enemy_x_p[target] - x[i];
-    wire signed [7:0] dy_fire = enemy_y_p[target] - y[i];
+    wire signed [7:0] dx_fire = enemy_x_p1[target] - x1[i];
+    wire signed [7:0] dy_fire = enemy_y_p1[target] - y1[i];
 
     assign fire_dir[i] = ( (dx_fire > dy_fire) && (dx_fire > -dy_fire) ) ? 2'd0 :
                          ( (dx_fire < dy_fire) && (dx_fire > -dy_fire) ) ? 2'd3 :
@@ -159,21 +159,21 @@ for (i = 0; i < 3; i++) begin : ship_logic
     wire enemy_close1 = valid1 && (sum1 <= (BULLET_RANGE + 6)) && is_enemy_approaching_dir(dx1_now, dy1_now, enemy_vx_sign[1], enemy_vy_sign[1]) ;
     wire enemy_close2 = valid2 && (sum2 <= (BULLET_RANGE + 6)) && is_enemy_approaching_dir(dx2_now, dy2_now, enemy_vx_sign[2], enemy_vy_sign[2]) ;
 
-    //assign attempt_cloak[i] = (energy[i] >= CLOAK_COST) && (enemy_close0 || enemy_close1 || enemy_close2);
+    //assign attempt_cloak[i] = (energy1[i] >= CLOAK_COST) && (enemy_close0 || enemy_close1 || enemy_close2);
 
     wire very_close0 = valid0 && (sum0 <= 12);
     wire very_close1 = valid1 && (sum1 <= 12);
     wire very_close2 = valid2 && (sum2 <= 12);
     
     assign attempt_fire[i] =
-    (energy[i] >= FIRE_COST) &&
+    (energy1[i] >= FIRE_COST) &&
     (fire_on_0 || fire_on_1 || fire_on_2);
 
-    //assign attempt_fire[i] = ((energy[i] >= FIRE_COST) && (fire_on_0 || fire_on_1 || fire_on_2));
+    //assign attempt_fire[i] = ((energy1[i] >= FIRE_COST) && (fire_on_0 || fire_on_1 || fire_on_2));
     //assign attempt_shield[i] =
-    //((energy[i] >= SHIELD_COST) && (enemy_close0 || enemy_close1 || enemy_close2)) ||
-      //((energy[i] >= SHIELD_COST) && (very_close0 || very_close1 || very_close2));
-    //assign attempt_shield[i] = ((is_approaching(dx0_now, dy0_now, dx0_prev, dy0_prev) || is_approaching(dx1_now, dy1_now, dx1_prev, dy1_prev) || is_approaching(dx2_now, dy2_now, dx2_prev, dy2_prev) || (dist_sq0 <= FIRE_RANGE_SQ) || (dist_sq1 <= FIRE_RANGE_SQ) || (dist_sq2 <= FIRE_RANGE_SQ) && energy[i] >= SHIELD_COST));
+    //((energy1[i] >= SHIELD_COST) && (enemy_close0 || enemy_close1 || enemy_close2)) ||
+      //((energy1[i] >= SHIELD_COST) && (very_close0 || very_close1 || very_close2));
+    //assign attempt_shield[i] = ((is_approaching(dx0_now, dy0_now, dx0_prev, dy0_prev) || is_approaching(dx1_now, dy1_now, dx1_prev, dy1_prev) || is_approaching(dx2_now, dy2_now, dx2_prev, dy2_prev) || (dist_sq0 <= FIRE_RANGE_SQ) || (dist_sq1 <= FIRE_RANGE_SQ) || (dist_sq2 <= FIRE_RANGE_SQ) && energy1[i] >= SHIELD_COST));
 
     wire [15:0] best_dist_sq = 
       (valid0 && (!valid1 || dist_sq0 <= dist_sq1) && (!valid2 || dist_sq0 <= dist_sq2)) ? dist_sq0 :
@@ -197,13 +197,13 @@ for (i = 0; i < 3; i++) begin : ship_logic
       (mv_dy > 2)  ? 2 : (mv_dy < -2) ? -2 : mv_dy[2:0];
 
     // Border logic: clamp as before
-    assign x_a[i] = (x[i] >= BORDER - MARGIN) ? -2 :
-                    (x[i] <= -BORDER + MARGIN) ? 2 :
+    assign x_a[i] = (x1[i] >= BORDER - MARGIN) ? -2 :
+                    (x1[i] <= -BORDER + MARGIN) ? 2 :
        				  (i==2) ? -step_x :
                     step_x;
 
-    assign y_a[i] = (y[i] >= BORDER - MARGIN) ? -2 :
-                    (y[i] <= -BORDER + MARGIN) ? 2 :
+    assign y_a[i] = (y1[i] >= BORDER - MARGIN) ? -2 :
+                    (y1[i] <= -BORDER + MARGIN) ? 2 :
        				  (i==2) ? -step_y :
                     step_y;
 
@@ -227,9 +227,9 @@ endgenerate
       render() {
          // ... draw using fabric.js and signal values. (See VIZ docs under "LEARN" menu.)
          // For example...
-         const destroyed = (this.sigVal("team_swarna.destroyed").asInt() >> this.getIndex("ship")) & 1;
+         const destroyed1 = (this.sigVal("team_swarna.destroyed1").asInt() >> this.getIndex("ship")) & 1;
          return [
-            new fabric.Text(destroyed ? "I''m dead! ☹️" : "I''m alive! 😊", {
+            new fabric.Text(destroyed1 ? "I''m dead! ☹️" : "I''m alive! 😊", {
                left: 10, top: 50, originY: "center", fill: "black", fontSize: 10,
             })
          ];
