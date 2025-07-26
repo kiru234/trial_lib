@@ -220,7 +220,7 @@ endgenerate
 
 // [Optional]
 // Visualization of your logic for each ship.
-\TLV team_YOUR_GITHUB_ID_viz(/_top, _team_num)
+\TLV team_integrated_viz(/_top, _team_num)
    m5+io_viz(/_top, _team_num)   /// Visualization of your IOs.
    \viz_js
       m5_DefaultTeamVizBoxAndWhere()
@@ -228,7 +228,7 @@ endgenerate
       render() {
          // ... draw using fabric.js and signal values. (See VIZ docs under "LEARN" menu.)
          // For example...
-         const destroyed = (this.sigVal("team_YOUR_GITHUB_ID.destroyed").asInt() >> this.getIndex("ship")) & 1;
+         const destroyed = (this.sigVal("team_integrated.destroyed").asInt() >> this.getIndex("ship")) & 1;
          return [
             new fabric.Text(destroyed ? "I''m dead! ☹️" : "I''m alive! 😊", {
                left: 10, top: 50, originY: "center", fill: "black", fontSize: 10,
@@ -237,8 +237,8 @@ endgenerate
       },
 
 
-\TLV team_YOUR_GITHUB_ID(/_top)
-   m5+verilog_wrapper(/_top, YOUR_GITHUB_ID)
+\TLV team_integrated(/_top)
+   m5+verilog_wrapper(/_top, integrated)
 
 
 
