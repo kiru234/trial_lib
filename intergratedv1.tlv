@@ -24,8 +24,8 @@
                          /// Use "devel" or "demo". ("demo" will be used in competition.)
 
 
-   macro(team_YOUR_GITHUB_ID_module, ['
-      module team_YOUR_GITHUB_ID (
+   macro(team_integrated_module, ['
+      module team_integrated (
          // Inputs:
          input logic clk, input logic reset,
          input logic signed [7:0] x [m5_SHIP_RANGE], input logic signed [7:0] y [m5_SHIP_RANGE],   // Positions of your ships, as affected by last cycle's acceleration.
@@ -253,7 +253,7 @@ endgenerate
    // Your team as the first player. Provide:
    //   - your GitHub ID, (as in your \TLV team_* macro, above)
    //   - your team name--anything you like (that isn't crude or disrespectful)
-   m5_team(YOUR_GITHUB_ID, YOUR_TEAM_NAME)
+   m5_team(integrated, integrated)
    
    
    // Choose your opponent.
